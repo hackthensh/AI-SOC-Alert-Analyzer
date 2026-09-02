@@ -1,0 +1,23 @@
+from fastapi import FastAPI
+
+app = FastAPI(
+    title="AI-SOC Alert Analyzer",
+    description="Wazuh-based AI Security Operations Center backend",
+    version="1.0.0"
+)
+
+
+@app.get("/")
+def root():
+    return {
+        "project": "AI-SOC Alert Analyzer",
+        "status": "running",
+        "message": "SOC backend is online"
+    }
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy"
+    }

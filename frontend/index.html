@@ -1,0 +1,3981 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>AI-SOC Alert Analyzer</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        :root {
+
+            --bg: #070b12;
+            --panel: #0d131d;
+            --panel2: #111925;
+            --border: #202b3a;
+
+            --text: #edf3fa;
+            --muted: #8d9bad;
+
+            --green: #22c55e;
+            --blue: #38bdf8;
+            --yellow: #f59e0b;
+            --orange: #f97316;
+            --red: #ef4444;
+            --purple: #a78bfa;
+
+        }
+
+
+        body {
+
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(56, 189, 248, 0.08),
+                    transparent 30%
+                ),
+                var(--bg);
+
+            color: var(--text);
+
+            min-height: 100vh;
+
+        }
+
+
+        button,
+        select {
+            font: inherit;
+        }
+
+
+        .container {
+
+            width: min(1450px, 94%);
+
+            margin: auto;
+
+            padding: 28px 0 50px;
+
+        }
+
+
+        /* =========================================================
+           HEADER
+        ========================================================= */
+
+        .header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+
+            padding: 22px 24px;
+
+            background:
+                rgba(13, 19, 29, 0.92);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 15px 45px rgba(0, 0, 0, 0.25);
+
+            backdrop-filter: blur(12px);
+
+        }
+
+
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+        }
+
+
+        .logo {
+
+            width: 52px;
+            height: 52px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(56,189,248,.2),
+                    rgba(167,139,250,.2)
+                );
+
+            border:
+                1px solid rgba(56,189,248,.3);
+
+            font-size: 25px;
+
+        }
+
+
+        .brand h1 {
+
+            font-size: 24px;
+
+            letter-spacing: -0.5px;
+
+        }
+
+
+        .brand p {
+
+            color: var(--muted);
+
+            margin-top: 4px;
+
+            font-size: 13px;
+
+        }
+
+
+        .header-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+        }
+
+
+        .status {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 9px 13px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 10px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+        }
+
+
+        .dot {
+
+            width: 9px;
+            height: 9px;
+
+            border-radius: 50%;
+
+            background: var(--green);
+
+            box-shadow:
+                0 0 12px rgba(34,197,94,.7);
+
+        }
+
+
+        .refresh-btn {
+
+            border:
+                1px solid var(--border);
+
+            background: var(--panel2);
+
+            color: var(--text);
+
+            padding: 10px 15px;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            transition: .2s;
+
+        }
+
+
+        .refresh-btn:hover {
+
+            border-color: var(--blue);
+
+            transform: translateY(-1px);
+
+        }
+
+
+        /* =========================================================
+           SECTION
+        ========================================================= */
+
+        .section-title {
+
+            margin: 28px 0 14px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+        }
+
+
+        .section-title h2 {
+
+            font-size: 17px;
+
+        }
+
+
+        .section-title span {
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+        }
+
+
+        /* =========================================================
+           SUMMARY CARDS
+        ========================================================= */
+
+        .cards {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(5, minmax(0, 1fr));
+
+            gap: 14px;
+
+        }
+
+
+        .card {
+
+            background: var(--panel);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 15px;
+
+            padding: 19px;
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+
+        .card::after {
+
+            content: "";
+
+            position: absolute;
+
+            right: -30px;
+            bottom: -30px;
+
+            width: 100px;
+            height: 100px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(56,189,248,.05);
+
+        }
+
+
+        .card-label {
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            letter-spacing: .7px;
+
+        }
+
+
+        .card-value {
+
+            font-size: 30px;
+
+            font-weight: 700;
+
+            margin-top: 10px;
+
+        }
+
+
+        .card-low .card-value {
+            color: var(--green);
+        }
+
+
+        .card-medium .card-value {
+            color: var(--yellow);
+        }
+
+
+        .card-high .card-value {
+            color: var(--orange);
+        }
+
+
+        .card-critical .card-value {
+            color: var(--red);
+        }
+
+
+        /* =========================================================
+           MAIN GRID
+        ========================================================= */
+
+        .main-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1.55fr .85fr;
+
+            gap: 16px;
+
+            margin-top: 18px;
+
+        }
+
+
+        .panel {
+
+            background: var(--panel);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 17px;
+
+            overflow: hidden;
+
+        }
+
+
+        .panel-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding: 17px 19px;
+
+            border-bottom:
+                1px solid var(--border);
+
+        }
+
+
+        .panel-header h3 {
+
+            font-size: 15px;
+
+        }
+
+
+        .panel-header span {
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+        }
+
+
+        /* =========================================================
+           FILTER
+        ========================================================= */
+
+        .filters {
+
+            display: flex;
+
+            gap: 8px;
+
+        }
+
+
+        .filters select {
+
+            background: var(--panel2);
+
+            color: var(--text);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 8px;
+
+            padding: 7px 10px;
+
+            outline: none;
+
+        }
+
+
+        /* =========================================================
+           TABLE
+        ========================================================= */
+
+        .table-wrapper {
+
+            overflow-x: auto;
+
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 750px;
+
+        }
+
+
+        th {
+
+            text-align: left;
+
+            padding: 13px 16px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            letter-spacing: .6px;
+
+            background:
+                rgba(17,25,37,.7);
+
+        }
+
+
+        td {
+
+            padding: 14px 16px;
+
+            border-top:
+                1px solid rgba(32,43,58,.65);
+
+            font-size: 13px;
+
+        }
+
+
+        tr.alert-row {
+
+            cursor: pointer;
+
+            transition: .15s;
+
+        }
+
+
+        tr.alert-row:hover {
+
+            background:
+                rgba(56,189,248,.045);
+
+        }
+
+
+        tr.selected {
+
+            background:
+                rgba(56,189,248,.08);
+
+            box-shadow:
+                inset 3px 0 var(--blue);
+
+        }
+
+
+        .muted {
+
+            color: var(--muted);
+
+        }
+
+
+        .rule {
+
+            font-weight: 600;
+
+        }
+
+
+        /* =========================================================
+           BADGES
+        ========================================================= */
+
+        .badge {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 4px 8px;
+
+            border-radius: 7px;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            border:
+                1px solid transparent;
+
+        }
+
+
+        .badge-low {
+
+            color: var(--green);
+
+            background:
+                rgba(34,197,94,.09);
+
+            border-color:
+                rgba(34,197,94,.2);
+
+        }
+
+
+        .badge-medium {
+
+            color: var(--yellow);
+
+            background:
+                rgba(245,158,11,.09);
+
+            border-color:
+                rgba(245,158,11,.2);
+
+        }
+
+
+        .badge-high {
+
+            color: var(--orange);
+
+            background:
+                rgba(249,115,22,.09);
+
+            border-color:
+                rgba(249,115,22,.2);
+
+        }
+
+
+        .badge-critical {
+
+            color: var(--red);
+
+            background:
+                rgba(239,68,68,.09);
+
+            border-color:
+                rgba(239,68,68,.2);
+
+        }
+
+
+        .badge-info {
+
+            color: var(--blue);
+
+            background:
+                rgba(56,189,248,.09);
+
+            border-color:
+                rgba(56,189,248,.2);
+
+        }
+
+
+        /* =========================================================
+           DETAILS
+        ========================================================= */
+
+        .details {
+
+            padding: 18px;
+
+        }
+
+
+        .detail-empty {
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+        }
+
+
+        .detail-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 11px;
+
+        }
+
+
+        .detail-item {
+
+            padding: 11px;
+
+            background: var(--panel2);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 9px;
+
+        }
+
+
+        .detail-item.full {
+
+            grid-column:
+                1 / -1;
+
+        }
+
+
+        .detail-label {
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+            text-transform: uppercase;
+
+            letter-spacing: .6px;
+
+        }
+
+
+        .detail-value {
+
+            margin-top: 5px;
+
+            font-size: 13px;
+
+            word-break: break-word;
+
+        }
+
+
+        .analyze-btn {
+
+            width: 100%;
+
+            margin-top: 15px;
+
+            padding: 12px 14px;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #7c3aed
+                );
+
+            cursor: pointer;
+
+            font-weight: 700;
+
+            transition: .2s;
+
+        }
+
+
+        .analyze-btn:hover {
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 8px 25px
+                rgba(99,102,241,.25);
+
+        }
+
+
+        .analyze-btn:disabled {
+
+            opacity: .55;
+
+            cursor: not-allowed;
+
+            transform: none;
+
+        }
+
+
+        /* =========================================================
+           AI REPORT
+        ========================================================= */
+
+        .ai-panel {
+
+            margin-top: 16px;
+
+        }
+
+
+        .ai-content {
+
+            padding: 20px;
+
+        }
+
+
+        .ai-loading {
+
+            display: none;
+
+            color: var(--muted);
+
+            padding: 10px 0;
+
+        }
+
+
+        .ai-loading.active {
+
+            display: block;
+
+        }
+
+
+        .spinner {
+
+            width: 18px;
+
+            height: 18px;
+
+            display: inline-block;
+
+            vertical-align: middle;
+
+            border:
+                2px solid var(--border);
+
+            border-top-color:
+                var(--blue);
+
+            border-radius: 50%;
+
+            animation:
+                spin .8s linear infinite;
+
+            margin-right: 8px;
+
+        }
+
+
+        @keyframes spin {
+
+            to {
+                transform: rotate(360deg);
+            }
+
+        }
+
+
+        .report {
+
+            display: none;
+
+        }
+
+
+        .report.active {
+
+            display: block;
+
+        }
+
+
+        .report-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .report-title {
+
+            font-size: 18px;
+
+        }
+
+
+        .ai-model {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+        }
+
+
+        .report-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0,1fr));
+
+            gap: 12px;
+
+        }
+
+
+        .report-box {
+
+            padding: 15px;
+
+            background: var(--panel2);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 11px;
+
+        }
+
+
+        .report-box.full {
+
+            grid-column:
+                1 / -1;
+
+        }
+
+
+        .report-box h4 {
+
+            font-size: 12px;
+
+            color: var(--blue);
+
+            text-transform: uppercase;
+
+            letter-spacing: .6px;
+
+            margin-bottom: 9px;
+
+        }
+
+
+        .report-box p,
+        .report-box li {
+
+            color: #cbd5e1;
+
+            font-size: 13px;
+
+            line-height: 1.65;
+
+        }
+
+
+        .report-box ul {
+
+            padding-left: 18px;
+
+        }
+
+
+        .risk-large {
+
+            font-size: 28px;
+
+            font-weight: 800;
+
+        }
+
+
+        .risk-meta {
+
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+        }
+
+
+        .mitre-list {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+
+        }
+
+
+        .mitre {
+
+            padding: 5px 8px;
+
+            background:
+                rgba(167,139,250,.08);
+
+            border:
+                1px solid rgba(167,139,250,.25);
+
+            color: var(--purple);
+
+            border-radius: 7px;
+
+            font-size: 11px;
+
+        }
+
+
+        /* =========================================================
+           FULL AI ANALYSIS
+        ========================================================= */
+
+        .ai-full-analysis {
+
+            margin-top: 12px;
+
+            padding: 18px;
+
+            background:
+                rgba(7,11,18,.7);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 11px;
+
+        }
+
+
+        .ai-full-analysis h4 {
+
+            color: var(--purple);
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            letter-spacing: .6px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        .ai-raw-text {
+
+            white-space: pre-wrap;
+
+            color: #cbd5e1;
+
+            font-size: 13px;
+
+            line-height: 1.75;
+
+            word-break: break-word;
+
+        }
+
+
+        /* =========================================================
+           STATUS
+        ========================================================= */
+
+        .error {
+
+            padding: 14px 16px;
+
+            color: #fecaca;
+
+            background:
+                rgba(239,68,68,.08);
+
+            border:
+                1px solid rgba(239,68,68,.2);
+
+            border-radius: 10px;
+
+            font-size: 13px;
+
+        }
+
+
+        .success {
+
+            color: var(--green);
+
+        }
+
+
+        .empty {
+
+            text-align: center;
+
+            padding: 35px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+        }
+
+
+        /* =========================================================
+           FOOTER
+        ========================================================= */
+
+        footer {
+
+            text-align: center;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            margin-top: 30px;
+
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 1100px) {
+
+            .cards {
+
+                grid-template-columns:
+                    repeat(3, minmax(0, 1fr));
+
+            }
+
+
+            .main-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .container {
+
+                width: 94%;
+
+                padding-top: 15px;
+
+            }
+
+
+            .header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+            }
+
+
+            .header-right {
+
+                width: 100%;
+
+                justify-content: space-between;
+
+            }
+
+
+            .cards {
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+
+            }
+
+
+            .report-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .report-box.full {
+
+                grid-column: auto;
+
+            }
+
+
+            .detail-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .detail-item.full {
+
+                grid-column: auto;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =========================================================
+         HEADER
+    ========================================================= -->
+
+    <header class="header">
+
+        <div class="brand">
+
+            <div class="logo">
+                🛡️
+            </div>
+
+
+            <div>
+
+                <h1>
+                    AI-SOC Alert Analyzer
+                </h1>
+
+
+                <p>
+                    Wazuh Security Monitoring + Gemini AI Investigation
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="header-right">
+
+            <div class="status">
+
+                <span
+                    class="dot"
+                    id="statusDot"
+                ></span>
+
+
+                <span id="connectionStatus">
+                    Connecting...
+                </span>
+
+            </div>
+
+
+            <button
+                class="refresh-btn"
+                onclick="loadDashboard()"
+            >
+                ↻ Refresh
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         SECURITY OVERVIEW
+    ========================================================= -->
+
+    <div class="section-title">
+
+        <h2>
+            Security Overview
+        </h2>
+
+
+        <span id="lastUpdated">
+            Loading...
+        </span>
+
+    </div>
+
+
+    <section class="cards">
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Total Alerts
+            </div>
+
+
+            <div
+                class="card-value"
+                id="totalAlerts"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <div class="card card-low">
+
+            <div class="card-label">
+                Low
+            </div>
+
+
+            <div
+                class="card-value"
+                id="lowAlerts"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <div class="card card-medium">
+
+            <div class="card-label">
+                Medium
+            </div>
+
+
+            <div
+                class="card-value"
+                id="mediumAlerts"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <div class="card card-high">
+
+            <div class="card-label">
+                High
+            </div>
+
+
+            <div
+                class="card-value"
+                id="highAlerts"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <div class="card card-critical">
+
+            <div class="card-label">
+                Critical
+            </div>
+
+
+            <div
+                class="card-value"
+                id="criticalAlerts"
+            >
+                -
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- =========================================================
+         ALERT + DETAILS
+    ========================================================= -->
+
+    <section class="main-grid">
+
+
+        <!-- ALERT TABLE -->
+
+        <div class="panel">
+
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h3>
+                        Wazuh Security Alerts
+                    </h3>
+
+
+                    <span id="alertSource">
+                        Source: loading...
+                    </span>
+
+                </div>
+
+
+                <div class="filters">
+
+                    <select
+                        id="severityFilter"
+                        onchange="renderAlerts()"
+                    >
+
+                        <option value="ALL">
+                            All Severity
+                        </option>
+
+                        <option value="LOW">
+                            LOW
+                        </option>
+
+                        <option value="MEDIUM">
+                            MEDIUM
+                        </option>
+
+                        <option value="HIGH">
+                            HIGH
+                        </option>
+
+                        <option value="CRITICAL">
+                            CRITICAL
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Time
+                            </th>
+
+                            <th>
+                                Rule
+                            </th>
+
+                            <th>
+                                Level
+                            </th>
+
+                            <th>
+                                Risk
+                            </th>
+
+                            <th>
+                                Agent
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="alertsBody">
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                class="empty"
+                            >
+                                Loading Wazuh alerts...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- SELECTED ALERT -->
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h3>
+                        Selected Alert
+                    </h3>
+
+
+                    <span>
+                        Analyst investigation
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="details"
+                id="alertDetails"
+            >
+
+                <div class="detail-empty">
+
+                    Select an alert from the table
+                    to view its details and run
+                    Gemini AI analysis.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- =========================================================
+         AI REPORT
+    ========================================================= -->
+
+    <section class="panel ai-panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <h3>
+                    🤖 Gemini AI SOC Investigation
+                </h3>
+
+
+                <span>
+                    AI-assisted analysis — analyst validation required
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="ai-content">
+
+
+            <!-- LOADING -->
+
+            <div
+                class="ai-loading"
+                id="aiLoading"
+            >
+
+                <span class="spinner"></span>
+
+                Gemini is analyzing the selected
+                Wazuh alert...
+
+            </div>
+
+
+            <!-- EMPTY -->
+
+            <div
+                class="detail-empty"
+                id="aiEmpty"
+            >
+
+                Select an alert and click
+                <strong>Analyze with Gemini</strong>
+                to generate the SOC investigation report.
+
+            </div>
+
+
+            <!-- REPORT -->
+
+            <div
+                class="report"
+                id="aiReport"
+            >
+
+
+                <div class="report-header">
+
+
+                    <div>
+
+                        <div class="report-title">
+                            AI Investigation Report
+                        </div>
+
+
+                        <div
+                            class="ai-model"
+                            id="aiModel"
+                        >
+                            Model: -
+                        </div>
+
+                    </div>
+
+
+                    <div id="aiVerdictBadge"></div>
+
+
+                </div>
+
+
+                <div class="report-grid">
+
+
+                    <!-- VERDICT -->
+
+                    <div class="report-box">
+
+                        <h4>
+                            Verdict
+                        </h4>
+
+
+                        <p id="reportVerdict">
+                            -
+                        </p>
+
+                    </div>
+
+
+                    <!-- RISK -->
+
+                    <div class="report-box">
+
+                        <h4>
+                            Risk Assessment
+                        </h4>
+
+
+                        <div
+                            class="risk-large"
+                            id="reportRiskScore"
+                        >
+                            -
+                        </div>
+
+
+                        <div
+                            class="risk-meta"
+                            id="reportRiskLevel"
+                        >
+                            -
+                        </div>
+
+                    </div>
+
+
+                    <!-- WHAT HAPPENED -->
+
+                    <div class="report-box full">
+
+                        <h4>
+                            What Happened
+                        </h4>
+
+
+                        <p id="reportWhat">
+                            -
+                        </p>
+
+                    </div>
+
+
+                    <!-- EVIDENCE -->
+
+                    <div class="report-box full">
+
+                        <h4>
+                            Evidence
+                        </h4>
+
+
+                        <ul id="reportEvidence"></ul>
+
+                    </div>
+
+
+                    <!-- MITRE -->
+
+                    <div class="report-box">
+
+                        <h4>
+                            MITRE ATT&CK
+                        </h4>
+
+
+                        <div
+                            class="mitre-list"
+                            id="reportMitre"
+                        >
+                        </div>
+
+                    </div>
+
+
+                    <!-- FIX -->
+
+                    <div class="report-box">
+
+                        <h4>
+                            Recommended Fix
+                        </h4>
+
+
+                        <ul id="reportFix"></ul>
+
+                    </div>
+
+
+                    <!-- NEXT -->
+
+                    <div class="report-box full">
+
+                        <h4>
+                            Next Investigation
+                        </h4>
+
+
+                        <ul id="reportNext"></ul>
+
+                    </div>
+
+
+                    <!-- FINAL VERDICT -->
+
+                    <div class="report-box full">
+
+                        <h4>
+                            Final Verdict
+                        </h4>
+
+
+                        <p id="reportFinal">
+                            -
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- FULL GEMINI REPORT -->
+
+                <div class="ai-full-analysis">
+
+                    <h4>
+                        Complete Gemini Analysis
+                    </h4>
+
+
+                    <div
+                        class="ai-raw-text"
+                        id="aiRawAnalysis"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <footer>
+
+        AI-SOC Alert Analyzer • Wazuh + FastAPI + Gemini
+
+    </footer>
+
+
+</div>
+
+
+<script>
+
+
+    /* =========================================================
+       GLOBAL STATE
+    ========================================================= */
+
+    let alerts = [];
+
+    let selectedAlert = null;
+
+
+    /* =========================================================
+       API HELPER
+    ========================================================= */
+
+    async function apiRequest(
+        url,
+        options = {}
+    ) {
+
+        const response =
+            await fetch(
+                url,
+                {
+                    ...options,
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        ...(options.headers || {})
+
+                    }
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}: ${response.statusText}`
+            );
+
+        }
+
+
+        return await response.json();
+
+    }
+
+
+    /* =========================================================
+       HEALTH
+    ========================================================= */
+
+    async function checkHealth() {
+
+        try {
+
+            await apiRequest(
+                "/health"
+            );
+
+
+            document.getElementById(
+                "connectionStatus"
+            ).textContent =
+                "Backend Online";
+
+
+            document.getElementById(
+                "statusDot"
+            ).style.background =
+                "var(--green)";
+
+
+        } catch (error) {
+
+            document.getElementById(
+                "connectionStatus"
+            ).textContent =
+                "Backend Offline";
+
+
+            document.getElementById(
+                "statusDot"
+            ).style.background =
+                "var(--red)";
+
+
+            console.error(error);
+
+        }
+
+    }
+
+
+    /* =========================================================
+       LOAD SUMMARY
+    ========================================================= */
+
+    async function loadSummary() {
+
+        try {
+
+            const data =
+                await apiRequest(
+                    "/api/wazuh-summary"
+                );
+
+
+            if (
+                data.status &&
+                data.status !== "success"
+            ) {
+
+                throw new Error(
+                    data.message ||
+                    "Summary failed"
+                );
+
+            }
+
+
+            document.getElementById(
+                "totalAlerts"
+            ).textContent =
+                data.total ?? 0;
+
+
+            document.getElementById(
+                "lowAlerts"
+            ).textContent =
+                data.low ?? 0;
+
+
+            document.getElementById(
+                "mediumAlerts"
+            ).textContent =
+                data.medium ?? 0;
+
+
+            document.getElementById(
+                "highAlerts"
+            ).textContent =
+                data.high ?? 0;
+
+
+            document.getElementById(
+                "criticalAlerts"
+            ).textContent =
+                data.critical ?? 0;
+
+
+            document.getElementById(
+                "alertSource"
+            ).textContent =
+                `Source: ${
+                    data.source || "Wazuh"
+                }`;
+
+
+        } catch (error) {
+
+            console.error(
+                "Summary error:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       LOAD ALERTS
+    ========================================================= */
+
+    async function loadAlerts() {
+
+        try {
+
+            const data =
+                await apiRequest(
+                    "/api/wazuh-alerts"
+                );
+
+
+            if (
+                Array.isArray(data)
+            ) {
+
+                alerts = data;
+
+            }
+
+            else if (
+                Array.isArray(data.alerts)
+            ) {
+
+                alerts =
+                    data.alerts;
+
+            }
+
+            else if (
+                Array.isArray(data.data)
+            ) {
+
+                alerts =
+                    data.data;
+
+            }
+
+            else {
+
+                alerts = [];
+
+            }
+
+
+            renderAlerts();
+
+
+        } catch (error) {
+
+            console.error(
+                "Alert loading error:",
+                error
+            );
+
+
+            document.getElementById(
+                "alertsBody"
+            ).innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="empty"
+                    >
+                        Unable to load Wazuh alerts.
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    }
+
+
+    /* =========================================================
+       NORMALIZE ALERT
+    ========================================================= */
+
+    function normalizeAlert(alert) {
+
+        const rule =
+            alert.rule || {};
+
+
+        const agent =
+            alert.agent || {};
+
+
+        const level =
+            Number(
+                rule.level ??
+                alert.alert_level ??
+                0
+            );
+
+
+        let riskLevel =
+            String(
+                alert.risk_level ||
+                alert.risk_category ||
+                ""
+            ).toUpperCase();
+
+
+        let riskScore =
+            Number(
+                alert.risk_score ??
+                0
+            );
+
+
+        if (!riskLevel) {
+
+            if (level >= 12) {
+
+                riskLevel =
+                    "CRITICAL";
+
+                riskScore =
+                    90;
+
+            }
+
+            else if (level >= 10) {
+
+                riskLevel =
+                    "HIGH";
+
+                riskScore =
+                    75;
+
+            }
+
+            else if (level >= 7) {
+
+                riskLevel =
+                    "HIGH";
+
+                riskScore =
+                    60;
+
+            }
+
+            else if (level >= 4) {
+
+                riskLevel =
+                    "MEDIUM";
+
+                riskScore =
+                    40;
+
+            }
+
+            else if (level >= 1) {
+
+                riskLevel =
+                    "LOW";
+
+                riskScore =
+                    20;
+
+            }
+
+            else {
+
+                riskLevel =
+                    "INFO";
+
+                riskScore =
+                    0;
+
+            }
+
+        }
+
+
+        return {
+
+            raw: alert,
+
+            timestamp:
+                alert.timestamp ||
+                alert.full_log ||
+                "-",
+
+            ruleId:
+                String(
+                    rule.id ??
+                    alert.rule_id ??
+                    "-"
+                ),
+
+            description:
+                rule.description ||
+                alert.description ||
+                "-",
+
+            level,
+
+            riskLevel,
+
+            riskScore,
+
+            agentName:
+                agent.name ||
+                alert.agent_name ||
+                "-",
+
+            agentId:
+                agent.id ||
+                alert.agent_id ||
+                "-",
+
+            agentIp:
+                agent.ip ||
+                alert.agent_ip ||
+                "-",
+
+            location:
+                alert.location ||
+                "-",
+
+            mitre:
+                rule.mitre ||
+                alert.mitre ||
+                null
+
+        };
+
+    }
+
+
+    /* =========================================================
+       RENDER ALERT TABLE
+    ========================================================= */
+
+    function renderAlerts() {
+
+        const tbody =
+            document.getElementById(
+                "alertsBody"
+            );
+
+
+        const filter =
+            document.getElementById(
+                "severityFilter"
+            ).value;
+
+
+        const normalized =
+            alerts.map(
+                normalizeAlert
+            );
+
+
+        const filtered =
+            filter === "ALL"
+
+                ? normalized
+
+                : normalized.filter(
+                    a =>
+                        a.riskLevel === filter
+                );
+
+
+        if (!filtered.length) {
+
+            tbody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="empty"
+                    >
+                        No alerts found.
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        tbody.innerHTML =
+            filtered.map(
+                (alert, index) => {
+
+                    const isSelected =
+                        selectedAlert &&
+                        selectedAlert.ruleId ===
+                            alert.ruleId &&
+                        selectedAlert.timestamp ===
+                            alert.timestamp;
+
+
+                    return `
+
+                        <tr
+                            class="alert-row ${
+                                isSelected
+                                    ? "selected"
+                                    : ""
+                            }"
+                            onclick="selectAlert(
+                                ${index},
+                                '${filter}'
+                            )"
+                        >
+
+                            <td class="muted">
+
+                                ${formatTime(
+                                    alert.timestamp
+                                )}
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="rule">
+
+                                    Rule ${
+                                        escapeHtml(
+                                            alert.ruleId
+                                        )
+                                    }
+
+                                </div>
+
+
+                                <div class="muted">
+
+                                    ${
+                                        escapeHtml(
+                                            truncate(
+                                                alert.description,
+                                                55
+                                            )
+                                        )
+                                    }
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="badge ${
+                                        severityClass(
+                                            alert.level
+                                        )
+                                    }"
+                                >
+
+                                    ${alert.level}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="badge ${
+                                        riskClass(
+                                            alert.riskLevel
+                                        )
+                                    }"
+                                >
+
+                                    ${
+                                        alert.riskLevel
+                                    }
+
+                                    ${
+                                        alert.riskScore
+                                            ? ` · ${alert.riskScore}`
+                                            : ""
+                                    }
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <div>
+
+                                    ${
+                                        escapeHtml(
+                                            alert.agentName
+                                        )
+                                    }
+
+                                </div>
+
+
+                                <div class="muted">
+
+                                    ${
+                                        escapeHtml(
+                                            alert.agentIp
+                                        )
+                                    }
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            ).join("");
+
+    }
+
+
+    /* =========================================================
+       SELECT ALERT
+    ========================================================= */
+
+    function selectAlert(
+        index,
+        filter
+    ) {
+
+        const normalized =
+            alerts.map(
+                normalizeAlert
+            );
+
+
+        const filtered =
+            filter === "ALL"
+
+                ? normalized
+
+                : normalized.filter(
+                    a =>
+                        a.riskLevel === filter
+                );
+
+
+        selectedAlert =
+            filtered[index] ||
+            null;
+
+
+        renderAlerts();
+
+        renderAlertDetails();
+
+        clearAIReport();
+
+    }
+
+
+    /* =========================================================
+       ALERT DETAILS
+    ========================================================= */
+
+    function renderAlertDetails() {
+
+        const container =
+            document.getElementById(
+                "alertDetails"
+            );
+
+
+        if (!selectedAlert) {
+
+            container.innerHTML = `
+
+                <div class="detail-empty">
+
+                    Select an alert from the table
+                    to view its details and run
+                    Gemini AI analysis.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        const a =
+            selectedAlert;
+
+
+        container.innerHTML = `
+
+            <div class="detail-grid">
+
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        Rule ID
+                    </div>
+
+
+                    <div class="detail-value">
+
+                        ${escapeHtml(
+                            a.ruleId
+                        )}
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        Wazuh Level
+                    </div>
+
+
+                    <div class="detail-value">
+
+                        <span
+                            class="badge ${
+                                severityClass(
+                                    a.level
+                                )
+                            }"
+                        >
+
+                            ${a.level}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        Risk Level
+                    </div>
+
+
+                    <div class="detail-value">
+
+                        <span
+                            class="badge ${
+                                riskClass(
+                                    a.riskLevel
+                                )
+                            }"
+                        >
+
+                            ${a.riskLevel}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        Risk Score
+                    </div>
+
+
+                    <div class="detail-value">
+
+                        ${a.riskScore}/100
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-item full">
+
+                    <div class="detail-label">
+                        Description
+                    </div>
+
+
+                    <div class="detail-value">
+
+                        ${
+                            escapeHtml(
+                                a.description
+                            )
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        Agent
+                    </div>
+
+
+                    <div class="detail-value">
+
+                        ${
+                            escapeHtml(
+                                a.agentName
+                            )
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        Agent ID
+                    </div>
+
+
+                    <div class="detail-value">
+
+                        ${
+                            escapeHtml(
+                                a.agentId
+                            )
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        Agent IP
+                    </div>
+
+
+                    <div class="detail-value">
+
+                        ${
+                            escapeHtml(
+                                a.agentIp
+                            )
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        Location
+                    </div>
+
+
+                    <div class="detail-value">
+
+                        ${
+                            escapeHtml(
+                                a.location
+                            )
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-item full">
+
+                    <div class="detail-label">
+                        Timestamp
+                    </div>
+
+
+                    <div class="detail-value">
+
+                        ${
+                            escapeHtml(
+                                a.timestamp
+                            )
+                        }
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <button
+                class="analyze-btn"
+                id="analyzeBtn"
+                onclick="analyzeSelectedAlert()"
+            >
+
+                🤖 Analyze with Gemini
+
+            </button>
+
+        `;
+
+    }
+
+
+    /* =========================================================
+       GEMINI ANALYSIS
+    ========================================================= */
+
+    async function analyzeSelectedAlert() {
+
+        if (!selectedAlert) {
+
+            return;
+
+        }
+
+
+        const button =
+            document.getElementById(
+                "analyzeBtn"
+            );
+
+
+        if (button) {
+
+            button.disabled =
+                true;
+
+            button.textContent =
+                "🤖 Gemini Analyzing...";
+
+        }
+
+
+        const loading =
+            document.getElementById(
+                "aiLoading"
+            );
+
+
+        const empty =
+            document.getElementById(
+                "aiEmpty"
+            );
+
+
+        const report =
+            document.getElementById(
+                "aiReport"
+            );
+
+
+        loading.classList.add(
+            "active"
+        );
+
+
+        empty.style.display =
+            "none";
+
+
+        report.classList.remove(
+            "active"
+        );
+
+
+        try {
+
+            const response =
+                await apiRequest(
+                    "/api/ai-analyze-alert",
+                    {
+
+                        method: "POST",
+
+                        body:
+                            JSON.stringify(
+                                selectedAlert.raw
+                            )
+
+                    }
+                );
+
+
+            displayAIReport(
+                response
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Gemini error:",
+                error
+            );
+
+
+            empty.style.display =
+                "block";
+
+
+            empty.innerHTML = `
+
+                <div class="error">
+
+                    Gemini analysis failed.
+
+                    <br><br>
+
+                    ${
+                        escapeHtml(
+                            error.message
+                        )
+                    }
+
+                </div>
+
+            `;
+
+        }
+
+
+        loading.classList.remove(
+            "active"
+        );
+
+
+        if (button) {
+
+            button.disabled =
+                false;
+
+            button.textContent =
+                "🤖 Analyze Again";
+
+        }
+
+    }
+
+
+    /* =========================================================
+       DISPLAY AI REPORT
+    ========================================================= */
+
+    function displayAIReport(data) {
+
+        const report =
+            document.getElementById(
+                "aiReport"
+            );
+
+
+        report.classList.add(
+            "active"
+        );
+
+
+        /* -----------------------------------------------------
+           AI OBJECT
+        ----------------------------------------------------- */
+
+        const ai =
+            data.ai_analysis ||
+            {};
+
+
+        const analysis =
+            ai.analysis ||
+            data.analysis ||
+            "";
+
+
+        /* -----------------------------------------------------
+           MODEL
+        ----------------------------------------------------- */
+
+        const model =
+            ai.model ||
+            data.model ||
+            data.gemini_model ||
+            "Gemini";
+
+
+        document.getElementById(
+            "aiModel"
+        ).textContent =
+            `Model: ${model}`;
+
+
+        /* -----------------------------------------------------
+           RISK
+        ----------------------------------------------------- */
+
+        const riskScore =
+            data.risk_score ??
+            data.application_risk_score ??
+            selectedAlert?.riskScore ??
+            0;
+
+
+        const riskLevel =
+            data.risk_category ||
+            data.risk_level ||
+            data.application_risk_level ||
+            selectedAlert?.riskLevel ||
+            "LOW";
+
+
+        document.getElementById(
+            "reportRiskScore"
+        ).textContent =
+            `${riskScore}/100`;
+
+
+        document.getElementById(
+            "reportRiskLevel"
+        ).textContent =
+            `Risk level: ${riskLevel}`;
+
+
+        /* -----------------------------------------------------
+           VERDICT
+        ----------------------------------------------------- */
+
+        const verdict =
+            extractSection(
+                analysis,
+                "Verdict"
+            );
+
+
+        const cleanVerdict =
+            extractFirstLine(
+                verdict
+            ) ||
+            "Unknown";
+
+
+        document.getElementById(
+            "reportVerdict"
+        ).textContent =
+            cleanVerdict;
+
+
+        document.getElementById(
+            "aiVerdictBadge"
+        ).innerHTML = `
+
+            <span
+                class="badge ${
+                    verdictClass(
+                        cleanVerdict
+                    )
+                }"
+            >
+
+                ${
+                    escapeHtml(
+                        cleanVerdict
+                    )
+                }
+
+            </span>
+
+        `;
+
+
+        /* -----------------------------------------------------
+           WHAT HAPPENED
+        ----------------------------------------------------- */
+
+        const what =
+            extractSection(
+                analysis,
+                "What Happened"
+            );
+
+
+        document.getElementById(
+            "reportWhat"
+        ).textContent =
+            cleanMarkdown(
+                what ||
+                "No detailed explanation returned."
+            );
+
+
+        /* -----------------------------------------------------
+           EVIDENCE
+        ----------------------------------------------------- */
+
+        const evidence =
+            extractSection(
+                analysis,
+                "Evidence"
+            );
+
+
+        renderList(
+            "reportEvidence",
+            evidence ||
+            "No specific evidence returned."
+        );
+
+
+        /* -----------------------------------------------------
+           MITRE
+        ----------------------------------------------------- */
+
+        if (
+            Array.isArray(
+                data.mitre_ids
+            ) &&
+            data.mitre_ids.length > 0
+        ) {
+
+            renderMitre(
+                data.mitre_ids
+            );
+
+        }
+
+        else {
+
+            const mitreSection =
+                extractSection(
+                    analysis,
+                    "MITRE ATT&CK"
+                );
+
+
+            if (
+                mitreSection &&
+                !mitreSection
+                    .toLowerCase()
+                    .includes(
+                        "no reliable"
+                    )
+            ) {
+
+                renderMitre(
+                    mitreSection
+                );
+
+            }
+
+            else {
+
+                renderMitre(
+                    "No reliable MITRE ATT&CK mapping."
+                );
+
+            }
+
+        }
+
+
+        /* -----------------------------------------------------
+           RECOMMENDED FIX
+        ----------------------------------------------------- */
+
+        const fix =
+            extractSection(
+                analysis,
+                "Recommended Fix"
+            );
+
+
+        renderList(
+            "reportFix",
+            fix ||
+            "No specific remediation required."
+        );
+
+
+        /* -----------------------------------------------------
+           NEXT INVESTIGATION
+        ----------------------------------------------------- */
+
+        const next =
+            extractSection(
+                analysis,
+                "Next Investigation"
+            );
+
+
+        renderList(
+            "reportNext",
+            next ||
+            "No further investigation required."
+        );
+
+
+        /* -----------------------------------------------------
+           FINAL VERDICT
+        ----------------------------------------------------- */
+
+        const finalVerdict =
+            extractSection(
+                analysis,
+                "Final Verdict"
+            );
+
+
+        document.getElementById(
+            "reportFinal"
+        ).textContent =
+            cleanMarkdown(
+                finalVerdict ||
+                cleanVerdict
+            );
+
+
+        /* -----------------------------------------------------
+           COMPLETE GEMINI ANALYSIS
+        ----------------------------------------------------- */
+
+        document.getElementById(
+            "aiRawAnalysis"
+        ).textContent =
+            analysis ||
+            "No AI analysis returned.";
+
+    }
+
+
+    /* =========================================================
+       EXTRACT MARKDOWN SECTION
+    ========================================================= */
+
+    function extractSection(
+        text,
+        heading
+    ) {
+
+        if (
+            !text ||
+            typeof text !== "string"
+        ) {
+
+            return "";
+
+        }
+
+
+        const escapedHeading =
+            heading.replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&"
+            );
+
+
+        const regex =
+            new RegExp(
+                `##\\s*${escapedHeading}\\s*\\n([\\s\\S]*?)(?=\\n##\\s+|$)`,
+                "i"
+            );
+
+
+        const match =
+            text.match(
+                regex
+            );
+
+
+        if (!match) {
+
+            return "";
+
+        }
+
+
+        return match[1].trim();
+
+    }
+
+
+    /* =========================================================
+       FIRST LINE
+    ========================================================= */
+
+    function extractFirstLine(
+        text
+    ) {
+
+        if (!text) {
+
+            return "";
+
+        }
+
+
+        const lines =
+            text
+                .split("\n")
+                .map(
+                    line =>
+                        line
+                            .replace(
+                                /^[-*•]\s*/,
+                                ""
+                            )
+                            .trim()
+                )
+                .filter(Boolean);
+
+
+        return lines[0] || "";
+
+    }
+
+
+    /* =========================================================
+       CLEAN MARKDOWN
+    ========================================================= */
+
+    function cleanMarkdown(
+        text
+    ) {
+
+        if (!text) {
+
+            return "";
+
+        }
+
+
+        return String(text)
+
+            .replace(
+                /^\s*[-*•]\s*/gm,
+                ""
+            )
+
+            .replace(
+                /\*\*(.*?)\*\*/g,
+                "$1"
+            )
+
+            .replace(
+                /`([^`]+)`/g,
+                "$1"
+            )
+
+            .trim();
+
+    }
+
+
+    /* =========================================================
+       LIST RENDERER
+    ========================================================= */
+
+    function renderList(
+        id,
+        value
+    ) {
+
+        const element =
+            document.getElementById(
+                id
+            );
+
+
+        if (!element) {
+
+            return;
+
+        }
+
+
+        let items =
+            value;
+
+
+        if (
+            typeof value === "string"
+        ) {
+
+            items =
+                value
+
+                    .split("\n")
+
+                    .map(
+                        item =>
+                            item
+
+                                .replace(
+                                    /^\s*[-•*]\s*/,
+                                    ""
+                                )
+
+                                .trim()
+                    )
+
+                    .filter(Boolean);
+
+        }
+
+
+        if (!Array.isArray(items)) {
+
+            items = [
+                String(items)
+            ];
+
+        }
+
+
+        if (!items.length) {
+
+            element.innerHTML =
+                "<li>No specific information returned.</li>";
+
+            return;
+
+        }
+
+
+        element.innerHTML =
+            items
+
+                .map(
+                    item => `
+
+                        <li>
+
+                            ${
+                                escapeHtml(
+                                    typeof item ===
+                                        "string"
+
+                                        ? cleanMarkdown(
+                                            item
+                                        )
+
+                                        : JSON.stringify(
+                                            item
+                                        )
+                                )
+                            }
+
+                        </li>
+
+                    `
+                )
+
+                .join("");
+
+    }
+
+
+    /* =========================================================
+       MITRE
+    ========================================================= */
+
+    function renderMitre(
+        value
+    ) {
+
+        const element =
+            document.getElementById(
+                "reportMitre"
+            );
+
+
+        if (!element) {
+
+            return;
+
+        }
+
+
+        let items =
+            value;
+
+
+        if (
+            typeof value === "string"
+        ) {
+
+            items =
+                value
+
+                    .split(
+                        /[,;\n]/
+                    )
+
+                    .map(
+                        x =>
+                            x
+                                .replace(
+                                    /^\s*[-*•]\s*/,
+                                    ""
+                                )
+                                .trim()
+                    )
+
+                    .filter(Boolean);
+
+        }
+
+
+        if (!Array.isArray(items)) {
+
+            items = [
+                String(items)
+            ];
+
+        }
+
+
+        if (!items.length) {
+
+            element.innerHTML = `
+
+                <span class="muted">
+
+                    No reliable MITRE ATT&CK mapping.
+
+                </span>
+
+            `;
+
+            return;
+
+        }
+
+
+        const validItems =
+            items.filter(
+                item =>
+                    String(item)
+                        .toLowerCase()
+                        .indexOf(
+                            "no reliable"
+                        ) === -1
+            );
+
+
+        if (!validItems.length) {
+
+            element.innerHTML = `
+
+                <span class="muted">
+
+                    No reliable MITRE ATT&CK mapping.
+
+                </span>
+
+            `;
+
+            return;
+
+        }
+
+
+        element.innerHTML =
+            validItems
+
+                .map(
+                    item => {
+
+                        if (
+                            typeof item ===
+                            "object"
+                        ) {
+
+                            return `
+
+                                <span class="mitre">
+
+                                    ${
+                                        escapeHtml(
+                                            item.id ||
+                                            item.technique ||
+                                            JSON.stringify(
+                                                item
+                                            )
+                                        )
+                                    }
+
+                                </span>
+
+                            `;
+
+                        }
+
+
+                        return `
+
+                            <span class="mitre">
+
+                                ${
+                                    escapeHtml(
+                                        String(item)
+                                    )
+                                }
+
+                            </span>
+
+                        `;
+
+                    }
+                )
+
+                .join("");
+
+    }
+
+
+    /* =========================================================
+       CLEAR AI REPORT
+    ========================================================= */
+
+    function clearAIReport() {
+
+        document.getElementById(
+            "aiReport"
+        ).classList.remove(
+            "active"
+        );
+
+
+        document.getElementById(
+            "aiLoading"
+        ).classList.remove(
+            "active"
+        );
+
+
+        const empty =
+            document.getElementById(
+                "aiEmpty"
+            );
+
+
+        empty.style.display =
+            "block";
+
+
+        empty.innerHTML = `
+
+            Select an alert and click
+            <strong>Analyze with Gemini</strong>
+            to generate the SOC investigation report.
+
+        `;
+
+
+        const raw =
+            document.getElementById(
+                "aiRawAnalysis"
+            );
+
+
+        if (raw) {
+
+            raw.textContent =
+                "-";
+
+        }
+
+    }
+
+
+    /* =========================================================
+       DASHBOARD LOAD
+    ========================================================= */
+
+    async function loadDashboard() {
+
+        document.getElementById(
+            "lastUpdated"
+        ).textContent =
+            "Refreshing...";
+
+
+        await Promise.all([
+
+            checkHealth(),
+
+            loadSummary(),
+
+            loadAlerts()
+
+        ]);
+
+
+        document.getElementById(
+            "lastUpdated"
+        ).textContent =
+            `Updated ${
+                new Date()
+                    .toLocaleTimeString()
+            }`;
+
+    }
+
+
+    /* =========================================================
+       SEVERITY CLASS
+    ========================================================= */
+
+    function severityClass(
+        level
+    ) {
+
+        level =
+            Number(level);
+
+
+        if (level >= 12) {
+
+            return "badge-critical";
+
+        }
+
+
+        if (level >= 7) {
+
+            return "badge-high";
+
+        }
+
+
+        if (level >= 4) {
+
+            return "badge-medium";
+
+        }
+
+
+        if (level >= 1) {
+
+            return "badge-low";
+
+        }
+
+
+        return "badge-info";
+
+    }
+
+
+    /* =========================================================
+       RISK CLASS
+    ========================================================= */
+
+    function riskClass(
+        level
+    ) {
+
+        switch (
+            String(level)
+                .toUpperCase()
+        ) {
+
+            case "CRITICAL":
+
+                return "badge-critical";
+
+
+            case "HIGH":
+
+                return "badge-high";
+
+
+            case "MEDIUM":
+
+                return "badge-medium";
+
+
+            case "LOW":
+
+                return "badge-low";
+
+
+            default:
+
+                return "badge-info";
+
+        }
+
+    }
+
+
+    /* =========================================================
+       VERDICT CLASS
+    ========================================================= */
+
+    function verdictClass(
+        verdict
+    ) {
+
+        const value =
+            String(verdict)
+                .toLowerCase();
+
+
+        if (
+
+            value.includes(
+                "malicious"
+            )
+
+            ||
+
+            value.includes(
+                "critical"
+            )
+
+            ||
+
+            value.includes(
+                "true positive"
+            )
+
+        ) {
+
+            return "badge-critical";
+
+        }
+
+
+        if (
+
+            value.includes(
+                "suspicious"
+            )
+
+            ||
+
+            value.includes(
+                "high"
+            )
+
+        ) {
+
+            return "badge-high";
+
+        }
+
+
+        if (
+
+            value.includes(
+                "benign"
+            )
+
+            ||
+
+            value.includes(
+                "false positive"
+            )
+
+        ) {
+
+            return "badge-low";
+
+        }
+
+
+        return "badge-info";
+
+    }
+
+
+    /* =========================================================
+       FORMAT TIME
+    ========================================================= */
+
+    function formatTime(
+        timestamp
+    ) {
+
+        if (!timestamp) {
+
+            return "-";
+
+        }
+
+
+        try {
+
+            const date =
+                new Date(
+                    timestamp
+                );
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+
+                return String(
+                    timestamp
+                ).slice(
+                    0,
+                    19
+                );
+
+            }
+
+
+            return date.toLocaleString();
+
+
+        } catch {
+
+            return String(
+                timestamp
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       TRUNCATE
+    ========================================================= */
+
+    function truncate(
+        text,
+        length
+    ) {
+
+        text =
+            String(
+                text || ""
+            );
+
+
+        if (
+            text.length <= length
+        ) {
+
+            return text;
+
+        }
+
+
+        return (
+
+            text.substring(
+                0,
+                length
+            )
+
+            +
+
+            "..."
+
+        );
+
+    }
+
+
+    /* =========================================================
+       ESCAPE HTML
+    ========================================================= */
+
+    function escapeHtml(
+        value
+    ) {
+
+        return String(
+            value ?? ""
+        )
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+    /* =========================================================
+       START
+    ========================================================= */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        () => {
+
+            loadDashboard();
+
+
+            setInterval(
+                loadDashboard,
+                30000
+            );
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>
+```
